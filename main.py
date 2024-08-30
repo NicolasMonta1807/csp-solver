@@ -1,5 +1,13 @@
-from solvers import backtracking
+from solvers import backtracking, mrv_lcv
+from termcolor import colored
 import sys
+
+# termcolor colors mapping
+color_map = {
+    'RED': 'red',
+    'GREEN': 'green',
+    'BLUE': 'blue'
+}
 
 def read_problem(file):
   try:
@@ -36,6 +44,11 @@ def read_problem(file):
     print(f"Error reading file: {e}")
     return None
   
+def print_solution(solution, color_map):
+    # Prints using termcolor for better visualization
+    for region, color in solution.items():
+        print(f"{region}: {colored(color, color_map[color])}")
+
 def main():
   
     if len(sys.argv) < 2:
@@ -47,14 +60,26 @@ def main():
     map, colors = read_problem(filename)
     regions = list(map.keys())
 
-    coloring = backtracking.solve_map_coloring(map, regions, colors)
+    backtracking_solution = backtracking.solve_map_coloring(map, regions, colors)
 
-    if coloring:
+    print("-------------------------------------------")
+    print("Solving with backtracking")
+    if backtracking_solution:
         print("Valid coloring:")
-        for region, color in coloring.items():
-            print(f"{region}: {color}")
+        print_solution(backtracking_solution, color_map)
     else:
-        print("No valid coloring found.")
-        
+        print("No valid coloring found for backtracking.")
+    print("-------------------------------------------")
+            
+    print("-------------------------------------------")
+    print("Solving with Most Restricted Variable + Least Constraining Value")
+    mrv_solution = mrv_lcv.solve_map_coloring(map, regions, colors)
+    if mrv_solution:
+        print("Valid coloring:")
+        print_solution(mrv_solution, color_map)
+    else:
+        print("No valid coloring found for MRV+LCV.")
+    print("-------------------------------------------")
+          
 if __name__ == "__main__":
   main()
