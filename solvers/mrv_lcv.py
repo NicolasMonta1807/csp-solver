@@ -15,25 +15,38 @@ def least_constraining_value(region, map, colors, color_assignment):
     return sorted(colors, key=lambda color: sum(
         1 for neighbor in map[region] if is_valid(map, neighbor, color, color_assignment)))
 
-def solve_map_coloring(map, regions, colors, color_assignment=None):
+def solve_map_coloring(map, regions, colors, color_assignment=None, verbose=False):
     # Solves the map coloring problem using backtracking with heuristics
     if color_assignment is None:
         color_assignment = {}
 
     if len(color_assignment) == len(regions):
-        return color_assignment    # Selecciona la región usando la heurística MRV
+        return color_assignment  # All regions are assigned a color, problem solved
 
-
-    # Selects next region using Most Restricted Variable heuristic
+    # Select the next region using the Most Restricted Variable heuristic
     current_region = get_mrv_region(regions, map, colors, color_assignment)
 
     for color in least_constraining_value(current_region, map, colors, color_assignment):
+        # Print the attempt if verbose is enabled
+        if verbose:
+            print(f"Trying to assign {color} to {current_region}")
+
         if is_valid(map, current_region, color, color_assignment):
             color_assignment[current_region] = color
-            result = solve_map_coloring(map, regions, colors, color_assignment)
+
+            # Print the successful assignment if verbose is enabled
+            if verbose:
+                print(f"Assigned {color} to {current_region}")
+
+            result = solve_map_coloring(map, regions, colors, color_assignment, verbose)
             if result:
                 return result
-            del color_assignment[current_region]  # Backtrack
+            
+            # Backtrack
+            del color_assignment[current_region]
+
+            # Print the backtrack step if verbose is enabled
+            if verbose:
+                print(f"Backtracking from {current_region}")
 
     return None
-  

@@ -3,39 +3,39 @@ from termcolor import colored
 import sys
 
 def read_problem(file):
-  try:
-    with open(file, 'r') as f:
-      lines = f.readlines()
-      map = {}
-      colors = []
-      
-      read_colors = False
-      read_map = False
-      
-      for line in lines:
-        line = line.strip()
-        
-        if line == "colors":
-          read_colors = True
-          continue
-        
-        if line == "map":
-          read_map = True
-          read_colors = False
-          continue
-        
-        if read_colors:
-          colors = line.split(",")
-          
-        if read_map and line:
-          region, neighbors = line.split(':')
-          neighbors = neighbors.split(',')
-          map[region] = neighbors
-          
-      return map, colors
-  except Exception as e:
-    print(f"Error reading file: {e}")
-    return None
+    try:
+        with open(file, 'r') as f:
+            lines = f.readlines()
+            map = {}
+            colors = []
+            
+            read_colors = False
+            read_map = False
+            
+            for line in lines:
+                line = line.strip()
+                
+                if line == "colors":
+                    read_colors = True
+                    continue
+                
+                if line == "map":
+                    read_map = True
+                    read_colors = False
+                    continue
+                
+                if read_colors:
+                    colors = line.split(",")
+                    
+                if read_map and line:
+                    region, neighbors = line.split(':')
+                    neighbors = neighbors.split(',')
+                    map[region] = neighbors
+                    
+            return map, colors
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return None
   
 def print_solution(solution):
     # Prints using termcolor for better visualization
@@ -43,20 +43,22 @@ def print_solution(solution):
         print(f"{region}: {colored(color, color)}")
 
 def main():
-  
     if len(sys.argv) < 2:
-        print("Usage: python main.py <file>")
+        print("Usage: python main.py <file> [--verbose]")
         return
-  
+    
     filename = sys.argv[1]
-  
+    
+    # Check for the verbose flag in the CLI arguments
+    verbose = '--verbose' in sys.argv
+
     map, colors = read_problem(filename)
     regions = list(map.keys())
 
-    backtracking_solution = backtracking.solve_map_coloring(map, regions, colors)
-
     print("-------------------------------------------")
     print("Solving with backtracking")
+    backtracking_solution = backtracking.solve_map_coloring(map, regions, colors, verbose=verbose)
+    
     if backtracking_solution:
         print("Valid coloring:")
         print_solution(backtracking_solution)
@@ -66,7 +68,8 @@ def main():
             
     print("-------------------------------------------")
     print("Solving with Most Restricted Variable + Least Constraining Value")
-    mrv_solution = mrv_lcv.solve_map_coloring(map, regions, colors)
+    mrv_solution = mrv_lcv.solve_map_coloring(map, regions, colors, verbose=verbose)
+    
     if mrv_solution:
         print("Valid coloring:")
         print_solution(mrv_solution)
@@ -75,4 +78,4 @@ def main():
     print("-------------------------------------------")
           
 if __name__ == "__main__":
-  main()
+    main()
